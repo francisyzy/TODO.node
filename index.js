@@ -1,12 +1,14 @@
 const http = require('http')
-const fs = require('fs')
-const path = require('path')
 const express = require('express')
+const bodyParser = require('body-parser')
 
 const hostname = 'localhost'
 const port = 3000;
 
 const app = express()
+app.use(bodyParser.json())
+
+app.use(express.static(__dirname+ '/public'))
 
 app.use((req,res,next) => {
     console.log(req.headers)
