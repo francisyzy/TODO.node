@@ -2,12 +2,14 @@ const http = require('http')
 const express = require('express')
 const bodyParser = require('body-parser')
 
+const taskRouter = require('./routes/taskRoutes')
 const hostname = 'localhost'
 const port = 3000;
 
 const app = express()
 app.use(bodyParser.json())
 
+app.use('/tasks', taskRouter)
 app.use(express.static(__dirname+ '/public'))
 
 app.use((req,res,next) => {
@@ -16,6 +18,34 @@ app.use((req,res,next) => {
     res.setHeader('Content-Type', 'text/html')
     res.end('<html><body><h1>Express Server Test</h1></body></html>')
 })
+
+app.all('/tasks', (req,res,next) => {
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'text/plain')
+    next()
+  });
+
+app.get('/tasks/:taskId', (req,res,next) => {
+    res.statusCode = 200
+    res.end('will send details of task.' + req.params.taskId + ' to you!')
+})
+
+app.post('/tasks/:taskId', (req,res,next) => {
+    res.statusCode = 200
+    res.end('post operation not supported')
+})
+
+app.put('/tasks/:taskId', (req,res,next) => {
+    res.statusCode = 200
+    res.write('Updating the dish: ' + req.params.taskId)
+    res.end('Will update the dish: ' + req.params.taskId + ' with details: ' + req.body.description)
+})
+
+app.delete('/tasks/:taskId', (req,res,next) => {
+    res.statusCode = 200
+    res.end('deleting task: ' + req.params.taskId)
+})
+
 
 //req = request
 //res = response
