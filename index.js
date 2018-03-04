@@ -1,57 +1,35 @@
-const http = require('http')
-const fs = require('fs')
-const path = require('path')
+const MongoClient = require('mongodb').MongoClient
+const assert = require('assert')
 
-const hostname = 'localhost'
-const port = 3000;
+const url = 'mongodb://localhost:27017/conFusion'
 
+MongoClient.connect(url, (err,db) => {
+    assert.equal(err,null)
+    console.log('connected successfully')
 
-//req = request
-//res = response
-const server = http.createServer((req,res) =>{
-    console.log("URL: " + req.url + " Method: "+ req.method)
+    const collection = db.collection("dishes")
+    collection.insertOne({
+        "name":"Pizza2",
+        "description":"test12"
+    },
+    (err,result) => {
 
-    if(req.method == 'GET'){
-        var fileURL
-        if(req.url == '/'){
-            fileURL = '/index.html'
-            var filePath = path.resolve('./public' + fileURL)
-        }else{
-            fileURL = req.url
-            var filePath = path.resolve('./public' + fileURL + '.html')
-        }
-        
-        const fileExt = path.extname(filePath)
-        if(fileExt == '.html'){
-            fs.exists(filePath, (exists) => {
-                if(!exists){
-                    res.statusCode = 404
-                    res.setHeader('Content-Type', 'text/html')
-                    res.end('<html><body><h1>Error 404: ' + fileURL + ' not found</h1><body><html>')
-                    
-                    return
-                }
+        assert.equal(err,null)
 
-                res.statusCode = 200
-                res.setHeader('Content-Type', 'text/html')
-                fs.createReadStream(filePath).pipe(res)
+        console.log("after insert:\n")
+        console.log(result.ops)
+
+        collection.find({}).toArray((err,docs)=>{
+            assert.equal(err,null)
+
+            console.log("Found:\n")
+            console.log(docs)
+
+            db.dropCollection("dishes", (err,result) => {
+                assert.equal(err,null)
+
+                db.close()
             })
-        } else{
-            res.statusCode = 404
-                res.setHeader('Content-Type', 'text/html')
-                res.end('<html><body><h1>Error 404: ' + fileURL + ' not an html file</h1><body><html>')
-                
-                return
-        }
-    } else{
-        res.statusCode = 404
-            res.setHeader('Content-Type', 'text/html')
-            res.end('<html><body><h1>Error 404: ' + req.method + ' not supported</h1><body><html>')
-            
-            return
-    }
-})
-
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}`)
+        })
+    })
 })
