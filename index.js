@@ -21,12 +21,13 @@ connect.then((db) => {
     })
     .then((dishes) => {
       console.log(dishes)
-      
-      return Dishes.remove()
+
+      // return db.collection('dishes').drop();
+      return Dishes.remove() // https://stackoverflow.com/a/43943584
     })
     .then(() => {
       console.log('dropped collection')
-
+      // return db.close();
       return db.disconnect()
     })
     .catch((err) => console.log(err))
