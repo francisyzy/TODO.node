@@ -7,7 +7,10 @@ MongoClient.connect(url, (err,db) => {
     assert.equal(err,null)
     console.log('connected successfully')
 
-    const collection = db.collection("dishes")
+    const confusion = db.db("conFusion")
+
+    const collection = confusion.collection('dishes')
+
     collection.insertOne({
         "name":"Pizza2",
         "description":"test12"
@@ -25,7 +28,7 @@ MongoClient.connect(url, (err,db) => {
             console.log("Found:\n")
             console.log(docs)
 
-            db.dropCollection("dishes", (err,result) => {
+            confusion.dropCollection("dishes", (err,result) => {
                 assert.equal(err,null)
 
                 db.close()
