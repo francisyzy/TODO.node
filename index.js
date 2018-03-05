@@ -1,38 +1,32 @@
 const MongoClient = require('mongodb').MongoClient
 const assert = require('assert')
 
+const dboperation = require('./operations')
 const url = 'mongodb://localhost:27017/conFusion'
 
-MongoClient.connect(url, (err,db) => {
-    assert.equal(err,null)
-    console.log('connected successfully')
+MongoClient.connect(url, (err, db) => {
+  assert.equal(err, null)
+  console.log('connected successfully')
+  dboperation.insertDocument(db, {name: 'Test', description: 'asdasd'}, 'dishes', (result) => {
+    console.log('Insert document \n', result.ops)
 
-    const confusion = db.db("conFusion")
+    dboperation.findDocument(db, 'dishes', (docs) => {
+      console.log('Found Documents \n', docs)
 
-    const collection = confusion.collection('dishes')
+      dboperation.updateDocument(db, {name: 'Test'}, {description: '123'}, 'dishes', (result) => {
+        console.log('Updated document \n', result.result)
 
-    collection.insertOne({
-        "name":"Pizza2",
-        "description":"test12"
-    },
-    (err,result) => {
+        dboperation.findDocument(db, 'dishes', (docs) => {
+          console.log('Found Updated Documents \n', docs)
 
-        assert.equal(err,null)
+          const confusion = db.db('conFusion')
+          confusion.dropCollection('dishes', (result) => {
+            console.log('dropped collection')
 
-        console.log("after insert:\n")
-        console.log(result.ops)
-
-        collection.find({}).toArray((err,docs)=>{
-            assert.equal(err,null)
-
-            console.log("Found:\n")
-            console.log(docs)
-
-            confusion.dropCollection("dishes", (err,result) => {
-                assert.equal(err,null)
-
-                db.close()
-            })
+            db.close()
+          })
         })
+      })
     })
+  })
 })
