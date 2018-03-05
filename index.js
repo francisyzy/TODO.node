@@ -3,15 +3,13 @@ const mongoose = require('mongoose')
 const Dishes = require('./models/dishes')
 
 const url = 'mongodb://localhost:27017/conFusion'
-const connect = mongoose.connect(url, {
-  useMongoClient: true
-})
+const connect = mongoose.connect(url)
 
 connect.then((db) => {
   console.log('Conencted to server')
 
   var newDish = Dishes({
-    name: 'Dishasdname',
+    name: 'Dishasdnaasdsdame',
     description: 'NASD'
   })
 
@@ -23,13 +21,13 @@ connect.then((db) => {
     })
     .then((dishes) => {
       console.log(dishes)
-
-      return db.collection('dishes').drop()
+      
+      return Dishes.remove()
     })
     .then(() => {
       console.log('dropped collection')
 
-      return db.close()
+      return db.disconnect()
     })
     .catch((err) => console.log(err))
 })
