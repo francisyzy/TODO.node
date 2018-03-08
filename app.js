@@ -8,7 +8,7 @@ const mongoose = require('mongoose')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
-const lists = require('./routes/lists')
+const lists = require('./routes/listsRoutes')
 
 const app = express()
 

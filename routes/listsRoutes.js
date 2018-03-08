@@ -84,7 +84,7 @@ listRouter.route('/:listId/tasks')
         if (list != null) {
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
-          res.json(list.task)
+          res.json(list.tasks)
         } else {
           var err = new Error('List ' + req.params.listId + ' not found')
           err.statusCode = 404
@@ -120,14 +120,14 @@ listRouter.route('/:listId/tasks')
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null) {
-          for (var i = 0; i <= (list.task.length - 1); i++) {
-            list.task.id(list.task[i]._id).remove()
+          for (var i = 0; i <= (list.tasks.length - 1); i++) {
+            list.tasks.id(list.task[i]._id).remove()
           }
           list.save()
             .then((list) => {
               res.statusCode = 200
               res.setHeader('Content-Type', 'application/json')
-              res.json(list.task)
+              res.json(list.tasks)
             })
         } else {
           var err = new Error('List ' + req.params.listId + ' not found')
@@ -142,10 +142,10 @@ listRouter.route('/:listId/tasks/:taskId')
   .get((req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
-        if (list != null && list.task.id(req.params.taskId) != null) {
+        if (list != null && list.tasks.id(req.params.taskId) != null) {
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
-          res.json(list.task.taskId)
+          res.json(list.tasks.id(req.params.taskId))
         } else {
           var err = new Error('List ' + req.params.listId + ' not found')
           err.statusCode = 404
@@ -161,24 +161,24 @@ listRouter.route('/:listId/tasks/:taskId')
   .put((req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
-        if (list != null && list.task.id(req.params.taskId) != null) {
+        if (list != null && list.tasks.id(req.params.taskId) != null) {
           if (req.body.taskName) {
-            list.task.id(req.params.taskId).taskName = req.body.taskName
+            list.tasks.id(req.params.taskId).taskName = req.body.taskName
           }
           if (req.body.description) {
-            list.task.id(req.params.taskId).description = req.body.description
+            list.tasks.id(req.params.taskId).description = req.body.description
           }
           if (req.body.deadline) {
-            list.task.id(req.params.taskId).deadline = req.body.deadline
+            list.tasks.id(req.params.taskId).deadline = req.body.deadline
           }
           if (req.body.category) {
-            list.task.id(req.params.taskId).category = req.body.category
+            list.tasks.id(req.params.taskId).category = req.body.category
           }
           list.save()
             .then((list) => {
               res.statusCode = 200
               res.setHeader('Content-Type', 'application/json')
-              res.json(list.task.taskId)
+              res.json(list.tasks.id(req.params.taskId))
             })
         } else {
           var err = new Error('List ' + req.params.listId + ' not found')
@@ -191,13 +191,13 @@ listRouter.route('/:listId/tasks/:taskId')
   .delete((req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
-        if (list != null && list.task.id(req.params.taskId) != null) {
-          list.task.id(list.task.taskId).remove()
+        if (list != null && list.tasks.id(req.params.taskId) != null) {
+          list.tasks.id(list.tasks.taskId).remove()
           list.save()
             .then((list) => {
               res.statusCode = 200
               res.setHeader('Content-Type', 'application/json')
-              res.json(list.task)
+              res.json(list.tasks)
             })
         } else if (list == null) {
           var err = new Error('List ' + req.params.listId + ' not found')
