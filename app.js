@@ -22,6 +22,29 @@ connect.then((db) => {
   console.log(err)
 })
 
+// Auth setup
+function auth (req, res, next) {
+  console.log(req.header)
+  var authHeader = req.headers.authorization
+  if (!authHeader) {
+    let err = new Error('You are not authenticated')
+    res.setHeader('WWW-Authenticate', 'Basic')
+    next(err)
+  }
+  var auth = Buffer.from(authHeader.spilt(' '[1], 'base64').toString().spilt(':'))
+  var user = auth[0]
+  var pass = auth[1]
+  if (user === 'admin' && pass === 'password') {
+    next()
+  } else {
+    let err = new Error('You are not authenticated')
+    res.setHeader('WWW-Authenticate', 'Basic')
+    err.status = 401
+    next(err)
+  }
+}
+app.use(auth)
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
