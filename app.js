@@ -67,13 +67,13 @@ app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser('seceret-key'))
-app.use(session)({
+app.use(session({
   name: 'session-id',
   secret: 'Secret-key',
   saveUninitialized: false,
   resave: false,
   store: new FileStore()
-})
+}))
 app.use(auth)
 app.use(express.static(path.join(__dirname, 'public')))
 
