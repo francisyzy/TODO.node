@@ -26,8 +26,8 @@ connect.then((db) => {
 
 // Auth setup
 function auth (req, res, next) {
-  console.log(req.signedCookies)
-  if (!req.signedCookies.user) {
+  console.log(req.session)
+  if (!req.session.user) {
     let authHeader = req.headers.authorization
     if (!authHeader) {
       let err = new Error('You are not authenticated')
@@ -38,7 +38,7 @@ function auth (req, res, next) {
     let user = auth[0]
     let pass = auth[1]
     if (user === 'admin' && pass === 'password') {
-      res.cookie('user', 'admin', {signed: true})
+      req.session.user = 'admin'
       next()
     } else {
       let err = new Error('You are not authenticated')
@@ -47,7 +47,7 @@ function auth (req, res, next) {
       next(err)
     }
   } else {
-    if (req.signedCookies.user === 'admin') {
+    if (req.session.user === 'admin') {
       next()
     } else {
       let err = new Error('You are not authenticated')
