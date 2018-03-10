@@ -25,15 +25,15 @@ connect.then((db) => {
 // Auth setup
 function auth (req, res, next) {
   console.log(req.header)
-  var authHeader = req.headers.authorization
+  let authHeader = req.headers.authorization
   if (!authHeader) {
     let err = new Error('You are not authenticated')
     res.setHeader('WWW-Authenticate', 'Basic')
     next(err)
   }
-  var auth = Buffer.from(authHeader.spilt(' '[1], 'base64').toString().spilt(':'))
-  var user = auth[0]
-  var pass = auth[1]
+  let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')
+  let user = auth[0]
+  let pass = auth[1]
   if (user === 'admin' && pass === 'password') {
     next()
   } else {
@@ -43,18 +43,17 @@ function auth (req, res, next) {
     next(err)
   }
 }
-app.use(auth)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
-// uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
+app.use(auth)
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', index)
