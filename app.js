@@ -24,23 +24,35 @@ connect.then((db) => {
 
 // Auth setup
 function auth (req, res, next) {
-  console.log(req.header)
-  let authHeader = req.headers.authorization
-  if (!authHeader) {
-    let err = new Error('You are not authenticated')
-    res.setHeader('WWW-Authenticate', 'Basic')
-    next(err)
-  }
-  let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')
-  let user = auth[0]
-  let pass = auth[1]
-  if (user === 'admin' && pass === 'password') {
-    next()
+  console.log(req.signedCookies)
+  if (!req.signedCookies.user) {
+    let authHeader = req.headers.authorization
+    if (!authHeader) {
+      let err = new Error('You are not authenticated')
+      res.setHeader('WWW-Authenticate', 'Basic')
+      next(err)
+    }
+    let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')
+    let user = auth[0]
+    let pass = auth[1]
+    if (user === 'admin' && pass === 'password') {
+      res.cookie('user', 'admin', {signed: true})
+      next()
+    } else {
+      let err = new Error('You are not authenticated')
+      res.setHeader('WWW-Authenticate', 'Basic')
+      err.status = 401
+      next(err)
+    }
   } else {
-    let err = new Error('You are not authenticated')
-    res.setHeader('WWW-Authenticate', 'Basic')
-    err.status = 401
-    next(err)
+    if (req.signedCookies.user === 'admin') {
+      next()
+    } else {
+      let err = new Error('You are not authenticated')
+      res.setHeader('WWW-Authenticate', 'Basic')
+      err.status = 401
+      return next(err)
+    }
   }
 }
 
@@ -52,7 +64,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(cookieParser('seceret-key'))
 app.use(auth)
 app.use(express.static(path.join(__dirname, 'public')))
 
