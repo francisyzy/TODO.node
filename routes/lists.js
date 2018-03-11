@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 // const mongoose = require('mongoose')
 
-const Lists = require('../models/lists')
+const Lists = require('../models/list')
 
 const listRouter = express.Router()
 

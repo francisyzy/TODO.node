@@ -1,9 +1,99 @@
 const express = require('express')
-const router = express.Router()
+const bodyParser = require('body-parser')
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource')
-})
+const Users = require('../models/user')
 
-module.exports = router
+const userRouter = express.Router()
+
+userRouter.use(bodyParser.json())
+
+userRouter.route('/')
+  .get((req, res, next) => {
+    Users.find({})
+      .then((users) => {
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'application/json')
+        res.json(users)
+      }, (err) => next(err))
+      .catch((err) => next(err))
+  })
+
+userRouter.route('/signup')
+  .post((req, res, next) => {
+    console.log('Posting')
+    Users.findOne({username: req.body.username})
+      .then((user) => {
+        if (user != null) {
+          let err = new Error('User ' + req.body.username + ' already exists')
+          err.status = 403
+          next(err)
+        } else {
+          return Users.create({username: req.body.username, password: req.body.password})
+        }
+      })
+      .then((user) => {
+        res.statusCode = 200
+        res.setHeader('Content-Type', 'application/json')
+        res.json({status: 'Registration Successful!', user: user})
+      }, (err) => next(err))
+      .catch((err) => next(err))
+  })
+
+userRouter.route('/login')
+  .post((req, res, next) => {
+    if (!req.session.user) {
+      let authHeader = req.headers.authorization
+      if (!authHeader) {
+        let err = new Error('You are not authenticated')
+        res.setHeader('WWW-Authenticate', 'Basic')
+        next(err)
+      }
+      let auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':')
+      let username = auth[0]
+      let password = auth[1]
+
+      Users.findOne({username: username})
+        .then((user) => {
+          if (user.username === username && user.password === password) {
+            req.session.user = 'authenticated'
+            res.statusCode = 200
+            res.setHeader('Content-Type', 'text/plain')
+            res.end('You are authenticated')
+            next()
+          } else if (user.password !== password) {
+            let err = new Error('Password wrong')
+            err.status = 403
+            next(err)
+          } else if (user === null) {
+            let err = new Error('User ' + username + ' not found')
+            err.status = 403
+            next(err)
+          } else {
+            let err = new Error('You are not authenticated')
+            res.setHeader('WWW-Authenticate', 'Basic')
+            err.status = 401
+            next(err)
+          }
+        })
+        .catch((err) => next(err))
+    } else {
+      res.statusCode = 200
+      res.setHeader('Content-Type', 'text/plain')
+      res.end('You are already authenticated')
+    }
+  })
+
+userRouter.route('/logout')
+  .get((req, res, next) => {
+    if (req.session) {
+      req.session.destroy()
+      res.clearCookie('session-id')
+      res.redirect('/')
+    } else {
+      let err = new Error('You are not logged in')
+      err.status = 403
+      next(err)
+    }
+  })
+
+module.exports = userRouter
