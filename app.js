@@ -7,6 +7,8 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
 const FileStore = require('session-file-store')(session)
+const passport = require('passport')
+const authenticate = require('./authenticate')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
@@ -27,20 +29,13 @@ connect.then((db) => {
 // Auth setup
 function auth (req, res, next) {
   console.log('auth triggered' + req.session)
-  if (!req.session.user) {
+  if (!req.user) {
     let err = new Error('You are not authenticated')
     res.setHeader('WWW-Authenticate', 'Basic')
     err.status = 403
     return next(err)
   } else {
-    if (req.session.user === 'authenticated') {
-      next()
-    } else {
-      let err = new Error('You are not authenticated')
-      res.setHeader('WWW-Authenticate', 'Basic')
-      err.status = 403
-      return next(err)
-    }
+    next()
   }
 }
 
@@ -60,9 +55,10 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use('/', index)
 app.use('/users', users)
-console.log('app.use users activated?')
 app.use(auth)
 app.use(express.static(path.join(__dirname, 'public')))
 
