@@ -11,6 +11,7 @@ listRouter.use(bodyParser.json())
 listRouter.route('/')
   .get((req, res, next) => {
     Lists.find({})
+      .populate('owner')
       .then((lists) => {
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
@@ -19,6 +20,7 @@ listRouter.route('/')
       .catch((err) => next(err))
   })
   .post((req, res, next) => {
+    req.body.owner = req.user._id
     Lists.create(req.body)
       .then((list) => {
         console.log('List Created' + list)
@@ -45,6 +47,7 @@ listRouter.route('/')
 listRouter.route('/:listId')
   .get((req, res, next) => {
     Lists.findById(req.params.listId)
+      .populate('owner')
       .then((list) => {
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
@@ -80,6 +83,7 @@ listRouter.route('/:listId')
 listRouter.route('/:listId/tasks')
   .get((req, res, next) => {
     Lists.findById(req.params.listId)
+      .populate('owner')
       .then((list) => {
         if (list != null) {
           res.statusCode = 200
