@@ -5,15 +5,18 @@ const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const passport = require('passport')
+const authenticate = require('./authenticate')
+const config = require('./config')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
-const lists = require('./routes/listsRoutes')
+const lists = require('./routes/lists')
 
 const app = express()
 
 // Connection url
-const url = 'mongodb://localhost:27017/todo'
+const url = config.mongoUrl
 const connect = mongoose.connect(url)
 
 connect.then((db) => {
@@ -26,16 +29,17 @@ connect.then((db) => {
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
-// uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cookieParser())
-app.use(express.static(path.join(__dirname, 'public')))
-
+app.use(cookieParser('seceret-key'))
+app.use(passport.initialize())
 app.use('/', index)
 app.use('/users', users)
+app.use(express.static(path.join(__dirname, 'public')))
+
+app.use(authenticate.verifyUser)
 app.use('/lists', lists)
 
 // catch 404 and forward to error handler
