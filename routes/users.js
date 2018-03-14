@@ -22,17 +22,36 @@ userRouter.route('/')
 
 userRouter.route('/signup')
   .post((req, res, next) => {
-    User.register(new User({username: req.body.username}), req.body.password, (err, user) => {
+    User.register(new User({username: req.body.username, firstname: req.body.firstname, lastname: req.body.lastname, admin: req.body.admin}), req.body.password, (err, user) => {
       if (err) {
         res.statusCode = 500
         res.setHeader('Content-Type', 'application/json')
         res.json({err: err})
       } else {
+        // which method is better? the method that modifies the user after its created or the one that just creates it in thin air
+        // if (req.body.firstname) {
+        //   console.log('First Name:' + req.body.firstname)
+        //   User.firstname = req.body.firstname
+        // }
+        // if (req.body.lastname) {
+        //   User.lastname = req.body.lastname
+        // }
+        // if (req.body.admin) {
+        //   User.admin = req.body.admin
+        // }
+        // user.save((err, user) => {
+        //   if (err) {
+        //     res.statusCode = 500
+        //     res.setHeader('Content-Type', 'application/json')
+        //     res.json({err: err})
+        //     return
+        //   }
         passport.authenticate('local')(req, res, () => {
           res.statusCode = 200
           res.setHeader('Content-Type', 'application/json')
           res.json({success: true, status: 'Registration Successful!'})
         })
+        // })
       }
     })
   })
