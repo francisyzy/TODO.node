@@ -60,3 +60,10 @@ typings/
 
 # next.js build output
 .next
+
+#certificate & key 
+# https://security.stackexchange.com/questions/51146/is-it-bad-practice-to-add-an-encrypted-private-key-to-source-control
+# https://stackoverflow.com/questions/25366179/should-i-commit-self-signed-certificates-to-source-control
+bin/cert.csr
+bin/certificate.pem
+bin/private.key
