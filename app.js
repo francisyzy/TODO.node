@@ -12,6 +12,7 @@ const config = require('./config')
 const index = require('./routes/index')
 const users = require('./routes/users')
 const lists = require('./routes/lists')
+const uploads = require('./routes/uploads')
 
 const app = express()
 
@@ -46,6 +47,7 @@ app.use(cookieParser('seceret-key'))
 app.use(passport.initialize())
 app.use('/', index)
 app.use('/users', users)
+app.use('/upload', uploads)
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(authenticate.verifyUser)
