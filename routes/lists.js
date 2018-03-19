@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require('./cors')
 // const mongoose = require('mongoose')
 
 const Lists = require('../models/list')
@@ -9,7 +10,10 @@ const listRouter = express.Router()
 listRouter.use(bodyParser.json())
 
 listRouter.route('/')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStauts(200)
+  })
+  .get(cors.cors, (req, res, next) => {
     Lists.find({})
       .populate('owner')
       .then((lists) => {
@@ -19,7 +23,7 @@ listRouter.route('/')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .post((req, res, next) => {
+  .post(cors.corsWithOptions, (req, res, next) => {
     req.body.owner = req.user._id
     Lists.create(req.body)
       .then((list) => {
@@ -30,7 +34,7 @@ listRouter.route('/')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .put((req, res, next) => {
+  .put(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403
     res.end('Put operation not supported!')
   })
@@ -45,7 +49,10 @@ listRouter.route('/')
   })
 
 listRouter.route('/:listId')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStauts(200)
+  })
+  .get(cors.cors, (req, res, next) => {
     Lists.findById(req.params.listId)
       .populate('owner')
       .then((list) => {
@@ -55,11 +62,11 @@ listRouter.route('/:listId')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .post((req, res, next) => {
+  .post(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403
     res.end('Post operation not supported on /lists' + req.params.listId)
   })
-  .put((req, res, next) => {
+  .put(cors.corsWithOptions, (req, res, next) => {
     Lists.findByIdAndUpdate(req.params.listId, {
       $set: req.body
     }, {new: true})
@@ -70,7 +77,7 @@ listRouter.route('/:listId')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .delete((req, res, next) => {
+  .delete(cors.corsWithOptions, (req, res, next) => {
     Lists.findByIdAndRemove(req.params.listId)
       .then((resp) => {
         res.statusCode = 200
@@ -81,7 +88,10 @@ listRouter.route('/:listId')
   })
 
 listRouter.route('/:listId/tasks')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStauts(200)
+  })
+  .get(cors.cors, (req, res, next) => {
     Lists.findById(req.params.listId)
       .populate('owner')
       .then((list) => {
@@ -97,7 +107,7 @@ listRouter.route('/:listId/tasks')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .post((req, res, next) => {
+  .post(cors.corsWithOptions, (req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null) {
@@ -116,11 +126,11 @@ listRouter.route('/:listId/tasks')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .put((req, res, next) => {
+  .put(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403
     res.end('Put operation not supported on /lists/' + req.params.listId)
   })
-  .delete((req, res, next) => {
+  .delete(cors.corsWithOptions, (req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null) {
@@ -143,7 +153,10 @@ listRouter.route('/:listId/tasks')
   })
 
 listRouter.route('/:listId/tasks/:taskId')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => {
+    res.sendStauts(200)
+  })
+  .get(cors.cors, (req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null && list.tasks.id(req.params.taskId) != null) {
@@ -158,11 +171,11 @@ listRouter.route('/:listId/tasks/:taskId')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .post((req, res, next) => {
+  .post(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403
     res.end('Post operation not supported on /lists/' + req.params.listId)
   })
-  .put((req, res, next) => {
+  .put(cors.corsWithOptions, (req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null && list.tasks.id(req.params.taskId) != null) {
@@ -192,7 +205,7 @@ listRouter.route('/:listId/tasks/:taskId')
       }, (err) => next(err))
       .catch((err) => next(err))
   })
-  .delete((req, res, next) => {
+  .delete(cors.corsWithOptions, (req, res, next) => {
     Lists.findById(req.params.listId)
       .then((list) => {
         if (list != null && list.tasks.id(req.params.taskId) != null) {
