@@ -1,7 +1,21 @@
 {
-  user_id: "1",
-  title: "Test",
-  desc: "testing description",
-  deadline: 1519718236,
-  category: "Important"
+  "list": [
+    {
+      "listName": "ListName",
+      "description": "testing description",
+      "tasks": [
+        {
+          "taskName": "TaskName",
+          "description": "testing description",
+          "deadline": "2018-03-08T07:37:56Z",
+          "category": "Important"
+        }, {
+          "taskName": "TaskNametwo",
+          "description": "testing asdasdasd",
+          "deadline": "2018-03-09T07:37:56Z",
+          "category": "Importanttt"
+      }
+      ]
+    }
+  ]
 }
