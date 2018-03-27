@@ -12,6 +12,7 @@
     "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.15.5",
+    "express-react-views": "^0.10.5",
     "express-session": "^1.15.6",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.2.0",
